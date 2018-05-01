@@ -31,7 +31,14 @@ public class Board {
         frame.setVisible(true);
     }
 
-    public char[][] applyAction(char[][] config1, String action, char player){
+    public char[][] applyAction(char[][] configLol, String action, char player){
+        char[][] config1 = new char[3][3];
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                config1[i][j] = configLol[i][j];
+            }
+        }
+
         switch(action){
             case "ul": config1[0][0] = player; break;
             case "um": config1[0][1] = player; break;
@@ -44,7 +51,7 @@ public class Board {
             case "lr": config1[2][2] = player; break;                         
             default: break;
         }
-        return config;
+        return config1;
     }
 
     public void applyAction(String action){

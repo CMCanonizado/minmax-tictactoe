@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class Main {
     Board board;
     // ul um ur | ml mm mr | ll lm lr
+    char[][] newConfig;
 
     Main(){
         // Initialize board
@@ -14,9 +15,16 @@ public class Main {
         while(board.checkRunning() == 5){
             if(board.move == 1){ }
             else if(board.move == 2){
-                for(String action : getActions(board.config))
-                    if(getMax(board.config) == 1) board.applyAction(action);
-                    else if(getMax(board.config) == 0) board.applyAction(action);                    
+                for(String action : getActions(board.config)){
+                    newConfig = new char[3][3];
+                    for(int i=0; i<3; i++){
+                        for(int j=0; j<3; j++){
+                            newConfig[i][j] = board.config[i][j];
+                        }
+                    }
+                    if(getMax(newConfig) == 1){ board.applyAction(action); break; }
+                    else if(getMax(newConfig) == 0){ board.applyAction(action); break; }
+                }                    
             }
         }
 
@@ -66,31 +74,44 @@ public class Main {
         return 5; // Placeholder for G
     }
 
-    public int value(char[][] config1, String node){
+    public int value(char[][] configLol, String node){
+        char[][] config1 = new char[3][3];
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
-                System.out.print(config1[i][j]);
+                config1[i][j] = configLol[i][j];
             }
-            System.out.println();
         }
-        System.out.println();
         if(isTerminal(config1) != 5) return isTerminal(config1);
         if(node == "MIN") return getMax(config1);
         if(node == "MAX") return getMin(config1);   
         return 0;
     }
 
-    public int getMax(char[][] config1){
+    public int getMax(char[][] configLol){
         int m = -10;
-        for(String action : getActions(config1)){
+        char[][] config1 = new char[3][3];
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                config1[i][j] = configLol[i][j];
+            }
+        }
+
+        for(String action : getActions(config1)){    
             int v = value(board.applyAction(config1,action,'o'),"MAX");
             if(v > m) m = v; 
         }
         return m;
     }
 
-    public int getMin(char[][] config1){
+    public int getMin(char[][] configLol){
         int m = +10;
+        char[][] config1 = new char[3][3];
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                config1[i][j] = configLol[i][j];
+            }
+        }
+
         for(String action : getActions(config1)){
             int v = value(board.applyAction(config1,action,'x'),"MIN");
             if(v < m) m = v; 
