@@ -31,6 +31,37 @@ public class Board {
         frame.setVisible(true);
     }
 
+    public char[][] applyAction(char[][] config1, String action, char player){
+        switch(action){
+            case "ul": config1[0][0] = player; break;
+            case "um": config1[0][1] = player; break;
+            case "ur": config1[0][2] = player; break;
+            case "ml": config1[1][0] = player; break;
+            case "mm": config1[1][1] = player; break;
+            case "mr": config1[1][2] = player; break;
+            case "ll": config1[2][0] = player; break;
+            case "lm": config1[2][1] = player; break;
+            case "lr": config1[2][2] = player; break;                         
+            default: break;
+        }
+        return config;
+    }
+
+    public void applyAction(String action){
+        switch(action){
+            case "ul": this.config[0][0] = 'o'; this.buttons[0][0].doClick(); break;
+            case "um": this.config[0][1] = 'o'; this.buttons[0][1].doClick(); break;
+            case "ur": this.config[0][2] = 'o'; this.buttons[0][2].doClick(); break;
+            case "ml": this.config[1][0] = 'o'; this.buttons[1][0].doClick(); break;
+            case "mm": this.config[1][1] = 'o'; this.buttons[1][1].doClick(); break;
+            case "mr": this.config[1][2] = 'o'; this.buttons[1][2].doClick(); break;
+            case "ll": this.config[2][0] = 'o'; this.buttons[2][0].doClick(); break;
+            case "lm": this.config[2][1] = 'o'; this.buttons[2][1].doClick(); break;
+            case "lr": this.config[2][2] = 'o'; this.buttons[2][2].doClick(); break;                         
+            default: break;
+        }
+    }
+
     public int checkRunning(){
         String row, col, board = "";
 
