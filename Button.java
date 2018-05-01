@@ -13,8 +13,8 @@ public class Button extends JButton{
 	// To ensure that the image can only be clicked once
 	public Boolean clicked;
 
-	public Button(String filename, int x, int y){
-		changeImage(filename);
+	public Button(int x, int y){
+		this.changeImage("images/e.png");
 		this.x = x;
 		this.y = y;
 		this.clicked = false;

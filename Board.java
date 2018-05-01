@@ -4,14 +4,16 @@ import java.awt.*;
 
 public class Board {
     public char[][] config;
+    public Button[][] buttons;
     public JFrame frame;
 
     // To know which player is currently moving - either 1 or 2
     public int move;
 
-    public Board(int move){
-        this.move = move;
+    public Board(){
+        move = 1;
         config = new char[3][3];
+        buttons = new Button[3][3];
         frame = new JFrame("Tic-Tac-Toe | Arquilita & Canonizado");
         
         // Necessary settings for the frame
@@ -29,6 +31,38 @@ public class Board {
         frame.setVisible(true);
     }
 
+    public int checkRunning(){
+        String row, col, board = "";
+
+        // Check horizontally and vertically
+        for(int i=0; i<3; i++){
+            row = ""; col = "";
+            for(int j=0; j<3; j++){
+                row += config[i][j];
+                col += config[j][i];
+                board += config[i][j];
+            }
+            if(row.contains("xxx") || col.contains("xxx")) return 1; // Player 1 won
+            else if(row.contains("ooo") || col.contains("ooo")) return -1; // Player 2 won
+        }
+
+        String dia1 = "" + config[0][0] + config[1][1] + config[2][2];
+        String dia2 = "" + config[0][2] + config[1][1] + config[2][0];
+
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return 1; // Player 1 won
+        else if(dia1.contains("ooo") || dia2.contains("xxx")) return -1; // Player 2 won
+        
+        if(!board.contains("e")) return 0; // Draw
+
+        return 5; // Placeholder for G
+    }
+
+    public void unclick(){
+        for(int i=0; i<3; i++)
+            for(int j=0; j<3; j++)
+                buttons[i][j].clicked = true;
+    }
+
     private void loadBoard(){
         for(int i=0; i<3; i++)
             for(int j=0; j<3; j++){
@@ -37,36 +71,42 @@ public class Board {
                 config[i][j] = 'e';
 
                 // Create button that is initially empty
-                Button button = new Button("images/e.png", j, i);
+                Button button = new Button(j, i);
+                addButtonListener(button);
+
+                // Store button to buttons array and add to frame
+                buttons[i][j] = button;
                 frame.add(button); 
-
-                button.addActionListener(new ActionListener(){  
-                public void actionPerformed(ActionEvent e){  
-                        
-                        // Only move if current button has not been clicked yet
-                        if(!button.clicked){
-
-                            // Player 1
-                            if(move == 1){
-                                button.changeImage("images/x.png");  
-                                config[button.y][button.x] = 'x';
-                                move = 2;
-                            } 
-                            
-                            // Player 2
-                            else if(move == 2){
-                                button.changeImage("images/o.png");  
-                                config[button.y][button.x] = 'o';
-                                move = 1;
-                            }
-                            
-                            // Set clicked to true
-                            button.clicked = true;
-                        }
-                        printConfig();
-                    }  
-                });      
             }
+    }
+
+    private void addButtonListener(Button button){
+        button.addActionListener(new ActionListener(){  
+        public void actionPerformed(ActionEvent e){  
+                
+                // Only move if current button has not been clicked yet
+                if(!button.clicked){
+
+                    // Player 1
+                    if(move == 1){
+                        button.changeImage("images/x.png");  
+                        config[button.y][button.x] = 'x';
+                        move = 2;
+                    } 
+                    
+                    // Player 2
+                    else if(move == 2){
+                        button.changeImage("images/o.png");  
+                        config[button.y][button.x] = 'o';
+                        move = 1;
+                    }
+                    
+                    // Set clicked to true
+                    button.clicked = true;
+                }
+                checkRunning();
+            }  
+        });      
     }
 
     // For checking current configuration
