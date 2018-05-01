@@ -36,7 +36,6 @@ public class Main {
                         max = actionValue.get(action);
                         maxAction = action;
                     }
-                    System.out.println(action + " " + actionValue.get(action));
                 }
                 board.applyAction(maxAction);
             }
@@ -62,7 +61,7 @@ public class Main {
         return actions;
     }
 
-    public String isTerminal(char[][] config1, int utility){
+    public int isTerminal(char[][] config1, int utility){
         String row, col, board = "";
 
         // Check horizontally and vertically
@@ -73,19 +72,19 @@ public class Main {
                 col += config1[j][i];
                 board += config1[i][j];
             }
-            if(row.contains("ooo") || col.contains("ooo")) return "WIN"; // Player 2 won
-            else if(row.contains("xxx") || col.contains("xxx")) return "FAIL"; // Player 1 won
+            if(row.contains("xxx") || col.contains("xxx")) return -10; // Player 1 won
+            else if(row.contains("ooo") || col.contains("ooo")) return 10; // Player 2 won
         }
 
         String dia1 = "" + config1[0][0] + config1[1][1] + config1[2][2];
         String dia2 = "" + config1[0][2] + config1[1][1] + config1[2][0];
 
-        if(dia1.contains("ooo") || dia2.contains("ooo")) return "WIN"; // Player 2 won
-        else if(dia1.contains("xxx") || dia2.contains("xxx")) return "FAIL"; // Player 1 won
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return -10; // Player 1 won
+        else if(dia1.contains("ooo") || dia2.contains("xxx")) return 10; // Player 2 won
         
-        if(!board.contains("e")) return "DRAW"; // Draw
+        if(!board.contains("e")) return 0; // Draw
 
-        return "NONE"; // Placeholder for G
+        return 1; // Placeholder for G
     }
 
     public int value(char[][] configLol, String node, int utility){
@@ -95,16 +94,9 @@ public class Main {
                 config1[i][j] = configLol[i][j];
             }
         }
-        int is_terminal = 0;
-
-        if (isTerminal(config1, utility).equals("WIN")) is_terminal = 1;
-        else if (isTerminal(config1, utility).equals("PRIORITY")) is_terminal = 32000;
-        else if (isTerminal(config1, utility).equals("FAIL")) is_terminal = -1;
-        else if (isTerminal(config1, utility).equals("DRAW")) is_terminal = 0;
-
-        if(isTerminal(config1, utility).equals("NONE")) return utility + is_terminal;
-        if(node.equals("MIN")) return getMax(config1, utility);
-        if(node.equals("MAX")) return getMin(config1, utility);  
+        if(isTerminal(config1, utility) != 1) return utility + isTerminal(config1, utility);
+        if(node == "MIN") return getMax(config1, utility);
+        if(node == "MAX") return getMin(config1, utility);   
         return 0;
     }
 
@@ -121,12 +113,11 @@ public class Main {
             int v = value(board.applyAction(config1,action,'o'),"MAX", utility);
             if(v > m) m = v; 
         }
-        System.out.println(m);
         return m;
     }
 
     public int getMin(char[][] configLol, int utility){
-        int m = 30000;
+        int m = +30000;
         char[][] config1 = new char[3][3];
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
@@ -138,7 +129,6 @@ public class Main {
             int v = value(board.applyAction(config1,action,'x'),"MIN", utility);
             if(v < m) m = v; 
         }
-        System.out.println(m);
         return m;
     }
 
