@@ -34,7 +34,7 @@ public class Main {
                             newConfig[i][j] = board.config[i][j];
                         }
                     }
-                    actionValue.put(action, getMax(newConfig,0));
+                    actionValue.put(action, getMax(newConfig));
                 }  
 
                 // get the highest utility
@@ -46,6 +46,7 @@ public class Main {
                         maxAction = action;
                     }
                 }
+                System.out.println(max);
                 board.applyAction(maxAction);
             }
         }
@@ -83,7 +84,7 @@ public class Main {
         return actions;
     }
 
-    public int isTerminal(char[][] config1, int utility){
+    public int isTerminal(char[][] config1){
         String row, col, board = "";
 
         // Check horizontally and vertically
@@ -94,44 +95,39 @@ public class Main {
                 col += config1[j][i];
                 board += config1[i][j];
             }
-            if(row.contains("xxx") || col.contains("xxx")) return 5; // Player 1 won
-            else if(    row.contains("xxe") || col.contains("xxe") ||
-                        row.contains("xex") || col.contains("xex") ||
-                        row.contains("exx") || col.contains("exx")
-            ) return 3;
-            else if(row.contains("ooo") || col.contains("ooo")) return -1; // Player 2 won
+            if(row.contains("xxx") || col.contains("xxx")) return -1; // Player 1 won
+            else if(row.contains("ooo") || col.contains("ooo")) return 1; // Player 1 won            
         }
 
         String dia1 = "" + config1[0][0] + config1[1][1] + config1[2][2];
         String dia2 = "" + config1[0][2] + config1[1][1] + config1[2][0];
 
-        if(dia1.contains("xxx") || dia2.contains("xxx")) return 5; // Player 1 won
-        else if(    dia1.contains("xxe") || dia2.contains("xxe") ||
-                    dia1.contains("xex") || dia2.contains("xex") ||
-                    dia1.contains("exx") || dia2.contains("exx")
-        ) return 3;
-        else if(dia1.contains("ooo") || dia2.contains("ooo")) return -1; // Player 2 won
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return -1; // Player 1 won
+        else if(dia1.contains("ooo") || dia2.contains("ooo")) return 1; // Player 1 won
         
         if(!board.contains("e")) return 0; // Draw
 
         return 2; // Placeholder for G
     }
 
-    public int value(char[][] configLol, String node, int utility){
+    public int value(char[][] configLol, String node) {
         char[][] config1 = new char[3][3];
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
                 config1[i][j] = configLol[i][j];
             }
         }
-        int sum = 0;
-        if(isTerminal(config1, utility) != 2) return sum += isTerminal(config1, utility);
-        if(node == "MIN") return getMax(config1, utility);
-        if(node == "MAX") return getMin(config1, utility);   
-        return sum;
+
+        int utility = 0;
+        if(isTerminal(config1) != 2){
+            return isTerminal(config1);
+        }
+        if(node.equals("MIN")) return getMax(config1);
+        if(node.equals("MAX")) return getMin(config1);
+        return 0;
     }
 
-    public int getMax(char[][] configLol, int utility){
+    public int getMax(char[][] configLol){
         int m = -30000;
         char[][] config1 = new char[3][3];
         for(int i=0; i<3; i++){
@@ -141,14 +137,14 @@ public class Main {
         }
 
         for(String action : getActions(config1)){    
-            int v = value(board.applyAction(config1,action,'o'),"MAX", utility);
+            int v = value(board.applyAction(config1,action,'o'),"MAX");
             if(v > m) m = v; 
         }
         // System.out.println(utility + m);
-        return utility + m;
+        return m;
     }
 
-    public int getMin(char[][] configLol, int utility){
+    public int getMin(char[][] configLol){
         int m = +30000;
         char[][] config1 = new char[3][3];
         for(int i=0; i<3; i++){
@@ -158,11 +154,11 @@ public class Main {
         }
 
         for(String action : getActions(config1)){
-            int v = value(board.applyAction(config1,action,'x'),"MIN", utility);
+            int v = value(board.applyAction(config1,action,'x'),"MIN");
             if(v < m) m = v; 
         }
         // System.out.println(utility + m);
-        return utility + m;
+        return m;
     }
 
     public static void main(String[] args){
