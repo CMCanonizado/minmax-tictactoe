@@ -1,164 +1,155 @@
 // Arquilita, Jasper Ian Z. | Canonizado, Carlos Miguel E.
 // U-10L | Week 11 - Min-Max Trees
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import javafx.application.Application;
+import javafx.scene.media.MediaPlayer;
+import java.util.concurrent.TimeUnit;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
 import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import javafx.stage.Stage;
+import java.util.HashMap;
+import java.util.Random;
 import java.io.File;
 import java.net.URL;
-import javafx.application.Application;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.stage.Stage;
-import javafx.embed.swing.JFXPanel;
 
 public class Main {
     Board board;
-    // ul um ur | ml mm mr | ll lm lr
-    char[][] newConfig;
+    Random rand = new Random();
+    boolean first = true;
     final JFXPanel fxPanel = new JFXPanel();
+
+    // Note: X is always the User and O is always the AI
 
     Main(){
         // Initialize board
-        board = new Board();
+        board = new Board(rand.nextInt(2)+1);
+
         while(this.playMedia("./music/dasal_muna.mp3") != 1);
+        try { TimeUnit.SECONDS.sleep(1); }
+        catch(Exception event){ }
 
-        while(board.checkRunning() == 5){
-            if(board.move == 1){  }
+        while(board.checkRunning() == 3){
+            if(board.move == 1){ if(first) first = false; }
             else if(board.move == 2){
-                HashMap<String, Integer> actionValue = new HashMap<String, Integer>();
-                for(String action : getActions(board.config)){
-                    newConfig = new char[3][3];
-                    for(int i=0; i<3; i++){
-                        for(int j=0; j<3; j++){
-                            newConfig[i][j] = board.config[i][j];
-                        }
-                    }
-                    actionValue.put(action, getMax(newConfig));
-                }  
-
-                // get the highest utility
-                int max = -30000;
-                String maxAction = "";
-                for (String action: actionValue.keySet()) {
-                    if (actionValue.get(action) > max) {
-                        max = actionValue.get(action);
-                        maxAction = action;
-                    }
-                }
-                System.out.println(max);
-                board.applyAction(maxAction);
+                // If AI moves first - its move will automatically be at the center (to make it faster)
+                if(first){
+                    board.buttons[1][1].doClick();
+                    first = false;
+                } else board.applyAction(minmax(board.config," ","MAX").action); // Get action (Min-Max)
             }
         }
 
-        board.unclick();
-        if(board.checkRunning() == 1) JOptionPane.showMessageDialog(null, "Player 1 won!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);
-        else if(board.checkRunning() == -1) JOptionPane.showMessageDialog(null, "Player 2 won!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);        
-        else if(board.checkRunning() == 0) JOptionPane.showMessageDialog(null, "It's a draw!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);         
+        // Game is done - make sure buttons are now unclickable
+        board.unclickButtons();
+
+        // Prompt for users to exit
+        if(board.checkRunning() == 1){
+            int result = JOptionPane.showConfirmDialog(null, "You won! Exit?", "Result", 
+                JOptionPane.DEFAULT_OPTION);
+            while(this.playMedia("./music/par_asan.mp3") != 1);
+            if (result == 0) System.exit(0);
+        }
+        else if(board.checkRunning() == 2){
+            while(this.playMedia("./music/una_ulo.mp3") != 1);
+            int result = JOptionPane.showConfirmDialog(null, "The AI won! Exit?", "Result", 
+                JOptionPane.DEFAULT_OPTION);
+            if (result == 0) System.exit(0);            
+        }        
+        else if(board.checkRunning() == 0){
+            while(this.playMedia("./music/talon_din_ako.mp3") != 1);
+            int result = JOptionPane.showConfirmDialog(null, "It's a draw! Exit?", "Result", 
+                JOptionPane.DEFAULT_OPTION);
+            if (result == 0) System.exit(0);            
+        }         
     }
     
-    public int playMedia(String mp3) {
-        try {
-            URL resource = getClass().getResource(mp3);
-            Media media = new Media(resource.toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.play();
-        } catch (Exception err) {
-            return 0;
-        } finally {
-            return 1;
+// =================================== START OF MIN-MAX ALGO ===================================
+
+    public State minmax(char[][] config, String action, String node){
+        if(isTerminal(config) != 5) return (new State(action,isTerminal(config)));
+        if(node.equals("MAX")) return getMax(config, node);
+        if(node.equals("MIN")) return getMin(config, node);
+        return null;
+    }
+
+    public State getMax(char[][] config, String node){
+        State m = new State(" ",-30000);
+        for(String action : getActions(config)){
+            State v = minmax(board.applyAction(config, action, 'o'), action, "MIN");
+            if(v.value > m.value){
+                m.action = action;
+                m.value = v.value;
+            }   
         }
+        return m;
     }
 
-    public ArrayList<String> getActions(char[][] config1){
-        ArrayList<String> actions = new ArrayList<String>();
-        if(config1[0][0] == 'e') actions.add("ul");
-        if(config1[0][1] == 'e') actions.add("um");
-        if(config1[0][2] == 'e') actions.add("ur");
-        if(config1[1][0] == 'e') actions.add("ml");
-        if(config1[1][1] == 'e') actions.add("mm");
-        if(config1[1][2] == 'e') actions.add("mr");
-        if(config1[2][0] == 'e') actions.add("ll");
-        if(config1[2][1] == 'e') actions.add("lm");
-        if(config1[2][2] == 'e') actions.add("lr");
-        return actions;
+    public State getMin(char[][] config, String node){
+        State m = new State(" ", +30000);
+        for(String action : getActions(config)){
+            State v = minmax(board.applyAction(config, action, 'x'), action, "MAX");
+            if(v.value < m.value){
+                m.action = action;
+                m.value = v.value;
+            }
+        }
+        return m;
     }
 
-    public int isTerminal(char[][] config1){
+// =================================== END OF MIN-MAX ALGO ===================================    
+
+    public int isTerminal(char[][] config){
         String row, col, board = "";
 
         // Check horizontally and vertically
         for(int i=0; i<3; i++){
             row = ""; col = "";
             for(int j=0; j<3; j++){
-                row += config1[i][j];
-                col += config1[j][i];
-                board += config1[i][j];
+                row += config[i][j];
+                col += config[j][i];
+                board += config[i][j];
             }
-            if(row.contains("xxx") || col.contains("xxx")) return -1; // Player 1 won
-            else if(row.contains("ooo") || col.contains("ooo")) return 1; // Player 1 won            
+            if(row.contains("xxx") || col.contains("xxx")) return -1; // USER won
+            else if(row.contains("ooo") || col.contains("ooo")) return 1; // AI won
         }
 
-        String dia1 = "" + config1[0][0] + config1[1][1] + config1[2][2];
-        String dia2 = "" + config1[0][2] + config1[1][1] + config1[2][0];
+        // Check both diagonals
+        String dia1 = "" + config[0][0] + config[1][1] + config[2][2];
+        String dia2 = "" + config[0][2] + config[1][1] + config[2][0];
 
-        if(dia1.contains("xxx") || dia2.contains("xxx")) return -1; // Player 1 won
-        else if(dia1.contains("ooo") || dia2.contains("ooo")) return 1; // Player 1 won
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return -1; // USER won
+        else if(dia1.contains("ooo") || dia2.contains("ooo")) return 1; // AI won
         
         if(!board.contains("e")) return 0; // Draw
 
-        return 2; // Placeholder for G
+        return 5; // This value means that the state is still not the terminal state
     }
 
-    public int value(char[][] configLol, String node) {
-        char[][] config1 = new char[3][3];
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
-                config1[i][j] = configLol[i][j];
-            }
-        }
-
-        int utility = 0;
-        if(isTerminal(config1) != 2){
-            return isTerminal(config1);
-        }
-        if(node.equals("MIN")) return getMax(config1);
-        if(node.equals("MAX")) return getMin(config1);
-        return 0;
+    // Gets all possible moves given the board configuration
+    public ArrayList<String> getActions(char[][] config){
+        ArrayList<String> actions = new ArrayList<String>();
+        if(config[0][0] == 'e') actions.add("ul"); // Upper Left
+        if(config[0][1] == 'e') actions.add("um"); // Upper Middle
+        if(config[0][2] == 'e') actions.add("ur"); // Upper Right
+        if(config[1][0] == 'e') actions.add("ml"); // Middle Left
+        if(config[1][1] == 'e') actions.add("mm"); // Middle Middle
+        if(config[1][2] == 'e') actions.add("mr"); // Middle Right
+        if(config[2][0] == 'e') actions.add("ll"); // Lower Left
+        if(config[2][1] == 'e') actions.add("lm"); // Lower Middle
+        if(config[2][2] == 'e') actions.add("lr"); // Lower Right
+        return actions;
     }
 
-    public int getMax(char[][] configLol){
-        int m = -30000;
-        char[][] config1 = new char[3][3];
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
-                config1[i][j] = configLol[i][j];
-            }
-        }
-
-        for(String action : getActions(config1)){    
-            int v = value(board.applyAction(config1,action,'o'),"MAX");
-            if(v > m) m = v; 
-        }
-        // System.out.println(utility + m);
-        return m;
-    }
-
-    public int getMin(char[][] configLol){
-        int m = +30000;
-        char[][] config1 = new char[3][3];
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
-                config1[i][j] = configLol[i][j];
-            }
-        }
-
-        for(String action : getActions(config1)){
-            int v = value(board.applyAction(config1,action,'x'),"MIN");
-            if(v < m) m = v; 
-        }
-        // System.out.println(utility + m);
-        return m;
+    public int playMedia(String mp3){
+        try {
+            URL resource = getClass().getResource(mp3);
+            Media media = new Media(resource.toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.play();
+        } catch (Exception err) { return 0;
+        } finally { return 1; }
     }
 
     public static void main(String[] args){

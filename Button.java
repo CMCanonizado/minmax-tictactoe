@@ -1,6 +1,6 @@
-import java.io.File;
 import javax.imageio.*;
 import javax.swing.*;
+import java.io.File;
 import java.awt.*;
 
 public class Button extends JButton{
@@ -14,10 +14,12 @@ public class Button extends JButton{
 	public Boolean clicked;
 
 	public Button(int x, int y){
-		this.changeImage("images/e.png");
 		this.x = x;
 		this.y = y;
 		this.clicked = false;
+
+		// Default image is a blank tile
+		this.changeImage("images/e.png");
 
 		// Necessary settings
 		this.setBorder(null);

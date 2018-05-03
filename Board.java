@@ -1,21 +1,31 @@
-import javax.swing.*;
+import javafx.application.Application;
+import javafx.scene.media.MediaPlayer;
+import java.util.concurrent.TimeUnit;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
+import javafx.stage.Stage;
 import java.awt.event.*;
+import javax.swing.*;
+import java.io.File;
+import java.net.URL;
 import java.awt.*;
 
 public class Board {
+    public JFrame frame;
     public char[][] config;
     public Button[][] buttons;
-    public JFrame frame;
+    final JFXPanel fxPanel = new JFXPanel();
 
     // To know which player is currently moving - either 1 or 2
     public int move;
 
-    public Board(){
-        move = 1;
+    public Board(int move){
+        this.move = move;
         config = new char[3][3];
         buttons = new Button[3][3];
-        frame = new JFrame("Tic-Tac-Toe | Arquilita & Canonizado");
-        
+        if(move == 1) frame = new JFrame("Tic-Tac-Toe | Arquilita & Canonizado | First Turn: USER");
+        else frame = new JFrame("Tic-Tac-Toe | Arquilita & Canonizado | First Turn: AI");
+
         // Necessary settings for the frame
         frame.setPreferredSize(new Dimension(600,600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,29 +41,32 @@ public class Board {
         frame.setVisible(true);
     }
 
-    public char[][] applyAction(char[][] configLol, String action, char player){
-        char[][] config1 = new char[3][3];
+    // Returns a new copy of the configuration after applying an action
+    public char[][] applyAction(char[][] oldConfig, String action, char player){
+        char[][] newConfig = new char[3][3];
         for(int i=0; i<3; i++){
             for(int j=0; j<3; j++){
-                config1[i][j] = configLol[i][j];
+                newConfig[i][j] = oldConfig[i][j];
             }
         }
 
         switch(action){
-            case "ul": config1[0][0] = player; break;
-            case "um": config1[0][1] = player; break;
-            case "ur": config1[0][2] = player; break;
-            case "ml": config1[1][0] = player; break;
-            case "mm": config1[1][1] = player; break;
-            case "mr": config1[1][2] = player; break;
-            case "ll": config1[2][0] = player; break;
-            case "lm": config1[2][1] = player; break;
-            case "lr": config1[2][2] = player; break;                         
+            case "ul": newConfig[0][0] = player; break;
+            case "um": newConfig[0][1] = player; break;
+            case "ur": newConfig[0][2] = player; break;
+            case "ml": newConfig[1][0] = player; break;
+            case "mm": newConfig[1][1] = player; break;
+            case "mr": newConfig[1][2] = player; break;
+            case "ll": newConfig[2][0] = player; break;
+            case "lm": newConfig[2][1] = player; break;
+            case "lr": newConfig[2][2] = player; break;                         
             default: break;
         }
-        return config1;
+
+        return newConfig;
     }
 
+    // For changing the actual configuration of the board
     public void applyAction(String action){
         switch(action){
             case "ul": this.config[0][0] = 'o'; this.buttons[0][0].doClick(); break;
@@ -80,22 +93,24 @@ public class Board {
                 col += config[j][i];
                 board += config[i][j];
             }
-            if(row.contains("xxx") || col.contains("xxx")) return 1; // Player 1 won
-            else if(row.contains("ooo") || col.contains("ooo")) return -1; // Player 2 won
+            if(row.contains("xxx") || col.contains("xxx")) return 1; // USER won
+            else if(row.contains("ooo") || col.contains("ooo")) return 2; // AI won
         }
 
+        // Check both diagonals
         String dia1 = "" + config[0][0] + config[1][1] + config[2][2];
         String dia2 = "" + config[0][2] + config[1][1] + config[2][0];
 
-        if(dia1.contains("xxx") || dia2.contains("xxx")) return 1; // Player 1 won
-        else if(dia1.contains("ooo") || dia2.contains("xxx")) return -1; // Player 2 won
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return 1; // USER won
+        else if(dia1.contains("ooo") || dia2.contains("ooo")) return 2; // AI won
         
         if(!board.contains("e")) return 0; // Draw
 
-        return 5; // Placeholder for G
+        return 3; // This value means that the game is still running
     }
 
-    public void unclick(){
+    // For making the buttons unclickable (when game is done)
+    public void unclickButtons(){
         for(int i=0; i<3; i++)
             for(int j=0; j<3; j++)
                 buttons[i][j].clicked = true;
@@ -108,7 +123,7 @@ public class Board {
                 // Initialize config board with 'e' (empty)
                 config[i][j] = 'e';
 
-                // Create button that is initially empty
+                // Create button that is initially an empty tile
                 Button button = new Button(i, j);
                 addButtonListener(button);
 
@@ -125,15 +140,18 @@ public class Board {
                 // Only move if current button has not been clicked yet
                 if(!button.clicked){
 
-                    // Player 1
+                    // USER
                     if(move == 1){
                         button.changeImage("images/x.png");  
                         config[button.x][button.y] = 'x';
                         move = 2;
                     } 
                     
-                    // Player 2
+                    // AI
                     else if(move == 2){
+                        while(playMedia("./music/ge_talon.mp3") != 1);
+                        try { TimeUnit.SECONDS.sleep(1); }
+                        catch(Exception event){ }
                         button.changeImage("images/o.png");  
                         config[button.x][button.y] = 'o';
                         move = 1;
@@ -142,9 +160,18 @@ public class Board {
                     // Set clicked to true
                     button.clicked = true;
                 }
-                printConfig();
             }  
         });      
+    }
+
+    public int playMedia(String mp3){
+        try {
+            URL resource = getClass().getResource(mp3);
+            Media media = new Media(resource.toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.play();
+        } catch (Exception err) { return 0;
+        } finally { return 1; }
     }
 
     // For checking current configuration

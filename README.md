@@ -7,7 +7,7 @@ Implemented using Java, the game is only for one player and he or she can attemp
 The algorithm used for the AI is Min-Max. Here is the pseudocode:
 
 ```
-value(s)
+minmax(s)
     if s is terminal: return utility(s)
     if s is max_node: return max_value(s)
     if s is min_node: return min_value(s)
