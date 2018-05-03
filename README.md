@@ -37,3 +37,4 @@ min_value(s)
 
 * Arquilita, Jasper Ian Z.
 * Canonizado, Carlos Miguel E.
+* GEH TALON UNA ULO

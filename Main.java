@@ -21,10 +21,10 @@ public class Main {
     Main(){
         // Initialize board
         board = new Board();
-        while(this.playMedia("./music/dasal_muna.mp3") != null);
+        while(this.playMedia("./music/dasal_muna.mp3") != 1);
 
         while(board.checkRunning() == 5){
-            if(board.move == 1){ }
+            if(board.move == 1){  }
             else if(board.move == 2){
                 HashMap<String, Integer> actionValue = new HashMap<String, Integer>();
                 for(String action : getActions(board.config)){
@@ -56,11 +56,17 @@ public class Main {
         else if(board.checkRunning() == 0) JOptionPane.showMessageDialog(null, "It's a draw!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);         
     }
     
-    public void playMedia(String mp3) {
-        URL resource = getClass().getResource(mp3);
-        Media media = new Media(resource.toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.play();
+    public int playMedia(String mp3) {
+        try {
+            URL resource = getClass().getResource(mp3);
+            Media media = new Media(resource.toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.play();
+        } catch (Exception err) {
+            return 0;
+        } finally {
+            return 1;
+        }
     }
 
     public ArrayList<String> getActions(char[][] config1){
@@ -89,9 +95,9 @@ public class Main {
                 board += config1[i][j];
             }
             if(row.contains("xxx") || col.contains("xxx")) return 5; // Player 1 won
-            else if(    row.contains("xxo") || col.contains("xxo") ||
-                        row.contains("xox") || col.contains("xox") ||
-                        row.contains("oxx") || col.contains("oxx")
+            else if(    row.contains("xxe") || col.contains("xxe") ||
+                        row.contains("xex") || col.contains("xex") ||
+                        row.contains("exx") || col.contains("exx")
             ) return 3;
             else if(row.contains("ooo") || col.contains("ooo")) return -1; // Player 2 won
         }
@@ -100,9 +106,9 @@ public class Main {
         String dia2 = "" + config1[0][2] + config1[1][1] + config1[2][0];
 
         if(dia1.contains("xxx") || dia2.contains("xxx")) return 5; // Player 1 won
-        else if(    dia1.contains("xxo") || dia2.contains("xxo") ||
-                    dia1.contains("xox") || dia2.contains("xox") ||
-                    dia1.contains("oxx") || dia2.contains("oxx")
+        else if(    dia1.contains("xxe") || dia2.contains("xxe") ||
+                    dia1.contains("xex") || dia2.contains("xex") ||
+                    dia1.contains("exx") || dia2.contains("exx")
         ) return 3;
         else if(dia1.contains("ooo") || dia2.contains("ooo")) return -1; // Player 2 won
         
@@ -119,7 +125,7 @@ public class Main {
             }
         }
         int sum = 0;
-        if(isTerminal(config1, utility) != 2) return isTerminal(config1, utility);
+        if(isTerminal(config1, utility) != 2) return sum += isTerminal(config1, utility);
         if(node == "MIN") return getMax(config1, utility);
         if(node == "MAX") return getMin(config1, utility);   
         return sum;
@@ -138,7 +144,7 @@ public class Main {
             int v = value(board.applyAction(config1,action,'o'),"MAX", utility);
             if(v > m) m = v; 
         }
-        System.out.println(utility + m);
+        // System.out.println(utility + m);
         return utility + m;
     }
 
@@ -155,7 +161,7 @@ public class Main {
             int v = value(board.applyAction(config1,action,'x'),"MIN", utility);
             if(v < m) m = v; 
         }
-        System.out.println(utility + m);
+        // System.out.println(utility + m);
         return utility + m;
     }
 

@@ -109,7 +109,7 @@ public class Board {
                 config[i][j] = 'e';
 
                 // Create button that is initially empty
-                Button button = new Button(j, i);
+                Button button = new Button(i, j);
                 addButtonListener(button);
 
                 // Store button to buttons array and add to frame
@@ -128,21 +128,21 @@ public class Board {
                     // Player 1
                     if(move == 1){
                         button.changeImage("images/x.png");  
-                        config[button.y][button.x] = 'x';
+                        config[button.x][button.y] = 'x';
                         move = 2;
                     } 
                     
                     // Player 2
                     else if(move == 2){
                         button.changeImage("images/o.png");  
-                        config[button.y][button.x] = 'o';
+                        config[button.x][button.y] = 'o';
                         move = 1;
                     }
                     
                     // Set clicked to true
                     button.clicked = true;
                 }
-                checkRunning();
+                printConfig();
             }  
         });      
     }
