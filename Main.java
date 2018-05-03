@@ -20,7 +20,7 @@ public class Main {
     boolean first = true;
     final JFXPanel fxPanel = new JFXPanel();
 
-    // Note: X is always the User and O is always the AI
+    // Note: X is always the USER and O is always the AI
 
     Main(){
         // Initialize board
