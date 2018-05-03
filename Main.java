@@ -4,15 +4,24 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
+import java.io.File;
+import java.net.URL;
+import javafx.application.Application;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
+import javafx.embed.swing.JFXPanel;
 
 public class Main {
     Board board;
     // ul um ur | ml mm mr | ll lm lr
     char[][] newConfig;
+    final JFXPanel fxPanel = new JFXPanel();
 
     Main(){
         // Initialize board
         board = new Board();
+        while(this.playMedia("./music/dasal_muna.mp3") != null);
 
         while(board.checkRunning() == 5){
             if(board.move == 1){ }
@@ -46,6 +55,13 @@ public class Main {
         else if(board.checkRunning() == -1) JOptionPane.showMessageDialog(null, "Player 2 won!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);        
         else if(board.checkRunning() == 0) JOptionPane.showMessageDialog(null, "It's a draw!", "TIC-TAC-TOE", JOptionPane.INFORMATION_MESSAGE);         
     }
+    
+    public void playMedia(String mp3) {
+        URL resource = getClass().getResource(mp3);
+        Media media = new Media(resource.toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.play();
+    }
 
     public ArrayList<String> getActions(char[][] config1){
         ArrayList<String> actions = new ArrayList<String>();
@@ -72,19 +88,27 @@ public class Main {
                 col += config1[j][i];
                 board += config1[i][j];
             }
-            if(row.contains("xxx") || col.contains("xxx")) return -10; // Player 1 won
-            else if(row.contains("ooo") || col.contains("ooo")) return 10; // Player 2 won
+            if(row.contains("xxx") || col.contains("xxx")) return 5; // Player 1 won
+            else if(    row.contains("xxo") || col.contains("xxo") ||
+                        row.contains("xox") || col.contains("xox") ||
+                        row.contains("oxx") || col.contains("oxx")
+            ) return 3;
+            else if(row.contains("ooo") || col.contains("ooo")) return -1; // Player 2 won
         }
 
         String dia1 = "" + config1[0][0] + config1[1][1] + config1[2][2];
         String dia2 = "" + config1[0][2] + config1[1][1] + config1[2][0];
 
-        if(dia1.contains("xxx") || dia2.contains("xxx")) return -10; // Player 1 won
-        else if(dia1.contains("ooo") || dia2.contains("xxx")) return 10; // Player 2 won
+        if(dia1.contains("xxx") || dia2.contains("xxx")) return 5; // Player 1 won
+        else if(    dia1.contains("xxo") || dia2.contains("xxo") ||
+                    dia1.contains("xox") || dia2.contains("xox") ||
+                    dia1.contains("oxx") || dia2.contains("oxx")
+        ) return 3;
+        else if(dia1.contains("ooo") || dia2.contains("ooo")) return -1; // Player 2 won
         
         if(!board.contains("e")) return 0; // Draw
 
-        return 1; // Placeholder for G
+        return 2; // Placeholder for G
     }
 
     public int value(char[][] configLol, String node, int utility){
@@ -94,10 +118,11 @@ public class Main {
                 config1[i][j] = configLol[i][j];
             }
         }
-        if(isTerminal(config1, utility) != 1) return utility + isTerminal(config1, utility);
+        int sum = 0;
+        if(isTerminal(config1, utility) != 2) return isTerminal(config1, utility);
         if(node == "MIN") return getMax(config1, utility);
         if(node == "MAX") return getMin(config1, utility);   
-        return 0;
+        return sum;
     }
 
     public int getMax(char[][] configLol, int utility){
@@ -113,7 +138,8 @@ public class Main {
             int v = value(board.applyAction(config1,action,'o'),"MAX", utility);
             if(v > m) m = v; 
         }
-        return m;
+        System.out.println(utility + m);
+        return utility + m;
     }
 
     public int getMin(char[][] configLol, int utility){
@@ -129,7 +155,8 @@ public class Main {
             int v = value(board.applyAction(config1,action,'x'),"MIN", utility);
             if(v < m) m = v; 
         }
-        return m;
+        System.out.println(utility + m);
+        return utility + m;
     }
 
     public static void main(String[] args){
