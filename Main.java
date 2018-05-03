@@ -19,9 +19,9 @@ public class Main {
     Random rand = new Random();
     boolean first = true;
     final JFXPanel fxPanel = new JFXPanel();
-
-    // Note: X is always the USER and O is always the AI
+    
     /*
+        Note: X is always the USER and O is always the AI
 
         !!! Important !!!
         If you feel that there is a slight delay, that is because of the sound effects
