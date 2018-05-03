@@ -46,9 +46,9 @@ public class Main {
 
         // Prompt for users to exit
         if(board.checkRunning() == 1){
+            while(this.playMedia("./music/talon_din_ako.mp3") != 1);
             int result = JOptionPane.showConfirmDialog(null, "You won! Exit?", "Result", 
                 JOptionPane.DEFAULT_OPTION);
-            while(this.playMedia("./music/par_asan.mp3") != 1);
             if (result == 0) System.exit(0);
         }
         else if(board.checkRunning() == 2){
@@ -58,7 +58,7 @@ public class Main {
             if (result == 0) System.exit(0);            
         }        
         else if(board.checkRunning() == 0){
-            while(this.playMedia("./music/talon_din_ako.mp3") != 1);
+            while(this.playMedia("./music/par_asan.mp3") != 1);
             int result = JOptionPane.showConfirmDialog(null, "It's a draw! Exit?", "Result", 
                 JOptionPane.DEFAULT_OPTION);
             if (result == 0) System.exit(0);            

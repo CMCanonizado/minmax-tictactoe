@@ -38,6 +38,7 @@ public class Board {
         frame.setLayout(new GridLayout(3,3));
         frame.setFocusable(true);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
