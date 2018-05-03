@@ -21,6 +21,19 @@ public class Main {
     final JFXPanel fxPanel = new JFXPanel();
 
     // Note: X is always the USER and O is always the AI
+    /*
+
+        !!! Important !!!
+        If you feel that there is a slight delay, that is because of the sound effects
+        we included. Just simply comment out these lines (will include where):
+
+        try { TimeUnit.SECONDS.sleep(1); }
+        catch(Exception event){ }
+
+        @ Line 43-44 - Main.java
+        @ Line 154-155 - Board.java
+
+    */
 
     Main(){
         // Initialize board
@@ -37,7 +50,8 @@ public class Main {
                 if(first){
                     board.buttons[1][1].doClick();
                     first = false;
-                } else board.applyAction(minmax(board.config," ","MAX").action); // Get action (Min-Max)
+                } // Get action of the AI - Alpha-Beta pruning is applied here
+                else board.applyAction(minmax(board.config," ","MAX",-30000,+30000).action); 
             }
         }
 
@@ -67,33 +81,33 @@ public class Main {
     
 // =================================== START OF MIN-MAX ALGO ===================================
 
-    public State minmax(char[][] config, String action, String node){
+    public State minmax(char[][] config, String action, String node, int alpha, int beta){
         if(isTerminal(config) != 5) return (new State(action,isTerminal(config)));
-        if(node.equals("MAX")) return getMax(config, node);
-        if(node.equals("MIN")) return getMin(config, node);
+        if(node.equals("MAX")) return getMax(config, node, alpha, beta);
+        if(node.equals("MIN")) return getMin(config, node, alpha, beta);
         return null;
     }
 
-    public State getMax(char[][] config, String node){
+    public State getMax(char[][] config, String node, int alpha, int beta){
         State m = new State(" ",-30000);
         for(String action : getActions(config)){
-            State v = minmax(board.applyAction(config, action, 'o'), action, "MIN");
-            if(v.value > m.value){
-                m.action = action;
-                m.value = v.value;
-            }   
+            State v = minmax(board.applyAction(config, action, 'o'), action, "MIN", alpha, beta);
+            m.action = ( (v.value>m.value) ? action : m.action );
+            m.value = ( (v.value>m.value) ? v.value : m.value );
+            if(m.value >= beta) return m;
+            alpha = ( (alpha>m.value) ? alpha : m.value );
         }
         return m;
     }
 
-    public State getMin(char[][] config, String node){
+    public State getMin(char[][] config, String node, int alpha, int beta){
         State m = new State(" ", +30000);
         for(String action : getActions(config)){
-            State v = minmax(board.applyAction(config, action, 'x'), action, "MAX");
-            if(v.value < m.value){
-                m.action = action;
-                m.value = v.value;
-            }
+            State v = minmax(board.applyAction(config, action, 'x'), action, "MAX", alpha, beta);
+            m.action = ( (v.value<m.value) ? action : m.action );
+            m.value = ( (v.value<m.value) ? v.value : m.value );
+            if(m.value <= alpha) return m;
+            beta = ( (beta<m.value) ? beta : m.value);
         }
         return m;
     }
