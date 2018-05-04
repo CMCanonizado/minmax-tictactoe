@@ -1,5 +1,5 @@
 // Arquilita, Jasper Ian Z. | Canonizado, Carlos Miguel E.
-// U-10L | Week 11 - Min-Max Trees
+// U-10L | Week 12 - Alpha-Beta Pruning
 
 import javafx.application.Application;
 import javafx.scene.media.MediaPlayer;
