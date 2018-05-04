@@ -31,7 +31,7 @@ public class Main {
         catch(Exception event){ }
 
         @ Line 43-44 - Main.java
-        @ Line 154-155 - Board.java
+        @ Line 74-75 - Board.java
 
     */
 
