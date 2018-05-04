@@ -69,20 +69,36 @@ public class Board {
 
     // For changing the actual configuration of the board
     public void applyAction(String action){
+        
+        while(playMedia("./music/ge_talon.mp3") != 1);
+        try { TimeUnit.SECONDS.sleep(1); }
+        catch(Exception event){ }
+
         switch(action){
-            case "ul": this.config[0][0] = 'o'; this.buttons[0][0].doClick(); break;
-            case "um": this.config[0][1] = 'o'; this.buttons[0][1].doClick(); break;
-            case "ur": this.config[0][2] = 'o'; this.buttons[0][2].doClick(); break;
-            case "ml": this.config[1][0] = 'o'; this.buttons[1][0].doClick(); break;
-            case "mm": this.config[1][1] = 'o'; this.buttons[1][1].doClick(); break;
-            case "mr": this.config[1][2] = 'o'; this.buttons[1][2].doClick(); break;
-            case "ll": this.config[2][0] = 'o'; this.buttons[2][0].doClick(); break;
-            case "lm": this.config[2][1] = 'o'; this.buttons[2][1].doClick(); break;
-            case "lr": this.config[2][2] = 'o'; this.buttons[2][2].doClick(); break;                         
+            case "ul": this.config[0][0] = 'o'; this.buttons[0][0].doClick(); 
+                this.buttons[0][0].changeImage("images/o.png"); this.buttons[0][0].clicked = true; break;
+            case "um": this.config[0][1] = 'o'; this.buttons[0][1].doClick();
+                this.buttons[0][1].changeImage("images/o.png"); this.buttons[0][1].clicked = true; break;
+            case "ur": this.config[0][2] = 'o'; this.buttons[0][2].doClick();
+                this.buttons[0][2].changeImage("images/o.png"); this.buttons[0][2].clicked = true; break;
+            case "ml": this.config[1][0] = 'o'; this.buttons[1][0].doClick();
+                this.buttons[1][0].changeImage("images/o.png"); this.buttons[1][0].clicked = true; break;
+            case "mm": this.config[1][1] = 'o'; this.buttons[1][1].doClick();
+                this.buttons[1][1].changeImage("images/o.png"); this.buttons[1][1].clicked = true; break;
+            case "mr": this.config[1][2] = 'o'; this.buttons[1][2].doClick();
+                this.buttons[1][2].changeImage("images/o.png"); this.buttons[1][2].clicked = true; break;
+            case "ll": this.config[2][0] = 'o'; this.buttons[2][0].doClick();
+                this.buttons[2][0].changeImage("images/o.png"); this.buttons[2][0].clicked = true; break;
+            case "lm": this.config[2][1] = 'o'; this.buttons[2][1].doClick();
+                this.buttons[2][1].changeImage("images/o.png"); this.buttons[2][1].clicked = true; break;
+            case "lr": this.config[2][2] = 'o'; this.buttons[2][2].doClick();                         
+                this.buttons[2][2].changeImage("images/o.png"); this.buttons[2][2].clicked = true; break;
             default: break;
         }
-    }
 
+        move = 1;
+    }
+    
     public int checkRunning(){
         String row, col, board = "";
 
@@ -139,27 +155,14 @@ public class Board {
         public void actionPerformed(ActionEvent e){  
                 
                 // Only move if current button has not been clicked yet
-                if(!button.clicked){
+                if(!button.clicked && move == 1){
 
                     // USER
-                    if(move == 1){
-                        button.changeImage("images/x.png");  
-                        config[button.x][button.y] = 'x';
-                        move = 2;
-                    } 
-                    
-                    // AI
-                    else if(move == 2){
-                        while(playMedia("./music/ge_talon.mp3") != 1);
-                        try { TimeUnit.SECONDS.sleep(1); }
-                        catch(Exception event){ }
-                        button.changeImage("images/o.png");  
-                        config[button.x][button.y] = 'o';
-                        move = 1;
-                    }
-                    
-                    // Set clicked to true
+                    button.changeImage("images/x.png");  
+                    config[button.x][button.y] = 'x';
                     button.clicked = true;
+                    move = 2;
+
                 }
             }  
         });      
