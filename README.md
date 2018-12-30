@@ -2,6 +2,19 @@
 
 Implemented using Java, the game is only for one player and he or she can attempt to defeat the AI.
 
+This was made in partial completion of CMSC 170, developed by:
+* Jasper Ian Arquilita
+* Carlos Miguel Canonizado
+
+## Play!
+
+To play, compile first and then run:
+
+```
+javac *.java
+java Main
+```
+
 ## Implementation of AI
 
 The algorithm used for the AI is Min-Max. Here is the pseudocode:
@@ -33,7 +46,6 @@ min_value(s)
     return m
 ```
 
-## Developers
+## Screenshot
 
-* Arquilita, Jasper Ian Z.
-* Canonizado, Carlos Miguel E.
+![alt text](./images/git.png "Game")
